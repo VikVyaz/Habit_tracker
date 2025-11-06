@@ -19,4 +19,4 @@ class Command(BaseCommand):
 
         user.save()
 
-        self.stdout.write(self.style.SUCCESS(f"Создан superuser с email: {user.email}"))
+        self.stdout.write(self.style.SUCCESS(f"Создан superuser с username: {user.username}"))

@@ -1,8 +1,8 @@
 from datetime import timedelta
 from pathlib import Path
-from corsheaders.defaults import default_headers
-from celery.schedules import crontab
 
+from celery.schedules import crontab
+from corsheaders.defaults import default_headers
 from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -33,12 +33,12 @@ INSTALLED_APPS = [
     "users",
 ]
 
-REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
-    ),
-    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
-}
+# REST_FRAMEWORK = {
+#     "DEFAULT_AUTHENTICATION_CLASSES": (
+#         "rest_framework_simplejwt.authentication.JWTAuthentication",
+#     ),
+#     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+# }
 
 if DEBUG:
     SIMPLE_JWT = {
