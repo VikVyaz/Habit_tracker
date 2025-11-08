@@ -1,12 +1,13 @@
+from unittest.mock import patch
+
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
-from django.utils import timezone
-from unittest.mock import patch
 
-from habits.models import UsefulHabit, PleasantHabit, Reword
+from habits.models import PleasantHabit, Reword, UsefulHabit
 from habits.serializers import UsefulHabitSerializer
-from habits.tests.results import USEFUL_LIST_RESULT_1, USEFUL_LIST_RESULT_2, USEFUL_LIST_RESULT_3
+from habits.tests.results import (USEFUL_LIST_RESULT_1, USEFUL_LIST_RESULT_2,
+                                  USEFUL_LIST_RESULT_3)
 from users.models import User
 
 

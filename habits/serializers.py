@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from habits.models import PleasantHabit, UsefulHabit, Reword
+from habits.models import PleasantHabit, Reword, UsefulHabit
 
 
 class UsefulHabitSerializer(serializers.ModelSerializer):

@@ -2,8 +2,9 @@ from django.urls import path
 from rest_framework.routers import DefaultRouter
 
 from .apps import HabitsConfig
-from .views import (PleasantHabitViewSet, RewordViewSet, UsefulHabitCreateView,
-                    UsefulHabitDestroyView, MyUsefulHabitListView, PublicUsefulHabitListView,
+from .views import (MyUsefulHabitListView, PleasantHabitViewSet,
+                    PublicUsefulHabitListView, RewordViewSet,
+                    UsefulHabitCreateView, UsefulHabitDestroyView,
                     UsefulHabitRetrieveView, UsefulHabitUpdateView)
 
 app_name = HabitsConfig.name

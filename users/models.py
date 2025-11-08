@@ -3,8 +3,11 @@ from django.db import models
 
 
 class User(AbstractUser):
-    username = models.CharField(verbose_name='Username', unique=True)
-    email = models.EmailField(verbose_name="Email", unique=True, blank=True, null=True)
+    """Модель пользователя"""
+
+    username = models.CharField(verbose_name='Username', unique=True, help_text='Имя пользователя')
+    email = models.EmailField(verbose_name="Email", unique=True, blank=True, null=True,
+                              help_text='Email пользователя')
     telegram_chat_id = models.CharField(
         max_length=20,
         blank=True,

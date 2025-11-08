@@ -32,7 +32,7 @@ class Reword(models.Model):
 
 
 class PleasantHabit(BaseHabit):
-    """Модель приятной привычки"""
+    """Модель Приятной привычки"""
 
     is_pleasant = models.BooleanField(default=True, help_text='Индикатор приятной привычки (only True)')
 
@@ -42,7 +42,7 @@ class PleasantHabit(BaseHabit):
 
 
 class UsefulHabit(BaseHabit):
-    """Модель полезной привычки"""
+    """Модель Полезной привычки"""
 
     is_pleasant = models.BooleanField(default=False, help_text='Индикатор полезной привычки (only False)')
     available = models.BooleanField(

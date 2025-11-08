@@ -4,17 +4,22 @@ from rest_framework.permissions import IsAuthenticated
 from habits.models import PleasantHabit, Reword, UsefulHabit
 from habits.paginators import HabitPaginator, RewordPaginator
 from habits.permissions import HabitPermission
-from habits.serializers import PleasantHabitSerializer, UsefulHabitSerializer, RewordSerializer
+from habits.serializers import (PleasantHabitSerializer, RewordSerializer,
+                                UsefulHabitSerializer)
 from habits.tasks import send_simple_notification
 
 
 class RewordViewSet(viewsets.ModelViewSet):
+    """ViewSet для Reword"""
+
     queryset = Reword.objects.all()
     serializer_class = RewordSerializer
     pagination_class = RewordPaginator
 
 
 class PleasantHabitViewSet(viewsets.ModelViewSet):
+    """ViewSet для PleasantHabit"""
+
     queryset = PleasantHabit.objects.all()
     serializer_class = PleasantHabitSerializer
     pagination_class = HabitPaginator
@@ -25,6 +30,8 @@ class PleasantHabitViewSet(viewsets.ModelViewSet):
 
 
 class MyUsefulHabitListView(generics.ListAPIView):
+    """List view для UsefulHabit, где авторизированный пользователь является хозяином привычки"""
+
     serializer_class = UsefulHabitSerializer
     pagination_class = HabitPaginator
     permission_classes = [IsAuthenticated, HabitPermission]
@@ -37,6 +44,8 @@ class MyUsefulHabitListView(generics.ListAPIView):
 
 
 class PublicUsefulHabitListView(generics.ListAPIView):
+    """List view для публичных UsefulHabit(is_public==True)"""
+
     serializer_class = UsefulHabitSerializer
     pagination_class = HabitPaginator
     permission_classes = [IsAuthenticated, HabitPermission]
@@ -48,6 +57,8 @@ class PublicUsefulHabitListView(generics.ListAPIView):
 
 
 class UsefulHabitCreateView(generics.CreateAPIView):
+    """Create view для UsefulHabit"""
+
     queryset = UsefulHabit.objects.all()
     serializer_class = UsefulHabitSerializer
     pagination_class = HabitPaginator
@@ -62,6 +73,8 @@ class UsefulHabitCreateView(generics.CreateAPIView):
 
 
 class UsefulHabitRetrieveView(generics.RetrieveAPIView):
+    """Retrieve view для UsefulHabit"""
+
     queryset = UsefulHabit.objects.all()
     serializer_class = UsefulHabitSerializer
     pagination_class = HabitPaginator
@@ -69,6 +82,8 @@ class UsefulHabitRetrieveView(generics.RetrieveAPIView):
 
 
 class UsefulHabitUpdateView(generics.UpdateAPIView):
+    """Update view для UsefulHabit"""
+
     queryset = UsefulHabit.objects.all()
     serializer_class = UsefulHabitSerializer
     pagination_class = HabitPaginator
@@ -83,6 +98,8 @@ class UsefulHabitUpdateView(generics.UpdateAPIView):
 
 
 class UsefulHabitDestroyView(generics.DestroyAPIView):
+    """Destroy view для UsefulHabit"""
+
     queryset = UsefulHabit.objects.all()
     serializer_class = UsefulHabitSerializer
     pagination_class = HabitPaginator
