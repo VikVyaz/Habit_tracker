@@ -126,9 +126,11 @@ jobs:
               -v redis_data:/data \
               redis:7
             
-            until docker exec db pg_isready -U $POSTGRES_USER; do sleep 2; done
+            until docker exec db 'pg_isready -U $POSTGRES_USER'; do sleep 2; done
         
             until docker exec redis redis-cli ping; do sleep 2; done
+          
+          EOF
 
 
       - name: Deploy App and Nginx to Server
