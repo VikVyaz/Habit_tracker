@@ -98,6 +98,8 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << EOF
             cd ~/DRF-final
             export TAG=${GITHUB_SHA}
-            sudo docker compose pull web
-            sudo docker compose up -d web
+            sudo docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${GITHUB_SHA}
+            sudo docker stop web 2>/dev/null || true
+            sudo docker rm web 2>/dev/null || true
+            sudo docker run -d --name web --env-file /home/test/DRF-final/.env ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${GITHUB_SHA}
           EOF
