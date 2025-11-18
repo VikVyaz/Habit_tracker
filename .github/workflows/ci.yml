@@ -72,11 +72,17 @@ jobs:
       - name: Log in to Docker Hub
         run: echo ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }} | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
 
-      - name: Build Docker image
-        run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }} -f Dockerfiles/web/Dockerfile .
+      - name: Build app image (web/celery/beat)
+        run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/drf_final_web:${{ github.sha }} -f Dockerfiles/web/Dockerfile .
 
-      - name: Push Docker image to Docker Hub
-        run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
+      - name: Push app image to Docker Hub
+        run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/drf_final_web:${{ github.sha }}
+
+      - name: Build nginx image
+        run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/drf_final_nginx:${{ github.sha }} -f Dockerfiles/nginx/Dockerfile .
+
+      - name: Push app image to Docker Hub
+        run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/drf_final_nginx:${{ github.sha }}
 
   deploy:
     runs-on: ubuntu-latest
@@ -88,22 +94,72 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
 
-      - name: Deploy .env and docker-compose.yaml to server
+      - name: Make dir on Server
+        run: ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "mkdir -p /home/test/DRF-final"
+
+      - name: Deploy .env to Server
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "cat > ~/DRF-final/.env" <<'EOF'
           ${{ secrets.ENV_FILE }}
           EOF
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "cat > ~/DRF-final/docker-compose.yaml" <<'EOF'
-          ${{ secrets.DOCKER_COMPOSE }}
-          EOF
 
-      - name: Deploy to Server
+      - name: Deploy DB and Redis on Server
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-            export DOCKER_HUB_USERNAME=${{ secrets.DOCKER_HUB_USERNAME }}
-            export TAG=${{ github.sha }}
-            cd ~/DRF-final
-            sudo docker compose down
-            sudo docker compose pull
-            sudo docker compose up -d --force-recreate
+          
+            docker network inspect DRF_network 2>/dev/null || docker network create DRF_network
+          
+            docker image inspect redis:7 2>/dev/null || docker pull redis:7
+            docker image inspect postgres:16 2>/dev/null || docker pull postgres:16
+          
+            docker volume inspect postgres_data 2>/dev/null || docker volume create postgres_data
+            docker volume inspect redis_data 2>/dev/null || docker volume create redis_data
+            
+            docker stop db redis 2>/dev/null || true
+            docker rm db redis 2>/dev/null || true
+          
+            docker run -d --name db --env-file /home/test/DRF-final/.env --network DRF_network \
+              -v postgres_data:/var/lib/postgresql/data \
+              postgres:16
+          
+            docker run -d --name redis --network DRF_network \
+              -v redis_data:/data \
+              redis:7
+            
+            until docker exec db pg_isready -U $POSTGRES_USER; do sleep 2; done
+        
+            until docker exec redis redis-cli ping; do sleep 2; done
+
+
+      - name: Deploy App and Nginx to Server
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+            
+            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/drf_final_web:${{ github.sha }}
+            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/drf_final_nginx:${{ github.sha }}
+            
+            docker volume inspect static_volume 2>/dev/null || docker volume create static_volume
+            
+            docker stop web celery celery-beat nginx 2>/dev/null || true
+            docker rm web celery celery-beat nginx 2>/dev/null || true
+            
+            docker run -d --name web --env-file /home/test/DRF-final/.env --network DRF_network \
+              ${{ secrets.DOCKER_HUB_USERNAME }}/drf_final_web:${{ github.sha }} \
+              sh -c "python manage.py migrate && \
+                     python manage.py collectstatic --noinput && \
+                    gunicorn config.wsgi:application --bind 0.0.0.0:8000"
+            
+            docker run -d --name celery --env-file /home/test/DRF-final/.env --network DRF_network \
+              ${{ secrets.DOCKER_HUB_USERNAME }}/drf_final_web:${{ github.sha }} \
+              celery -A config worker -l INFO -P eventlet
+            
+            docker run -d --name celery-beat --env-file /home/test/DRF-final/.env --network DRF_network \
+              ${{ secrets.DOCKER_HUB_USERNAME }}/drf_final_web:${{ github.sha }} \
+              celery -A config beat -l INFO
+
+            docker run -d --name nginx --network DRF_network \
+              -p 80:80 \
+              -v static_volume:/app/staticfiles \
+              ${{ secrets.DOCKER_HUB_USERNAME }}/drf_final_nginx:${{ github.sha }}
+           
           EOF
