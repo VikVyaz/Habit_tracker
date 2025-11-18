@@ -92,7 +92,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "cat > ~/DRF-final/.env" <<'EOF'
           ${{ secrets.ENV_FILE }}
-          EOF"
+          EOF
 
       - name: Deploy to Server
         run: |
