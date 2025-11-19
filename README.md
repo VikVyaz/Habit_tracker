@@ -28,6 +28,7 @@
    * `ENV_FILE` - твой .env файл с данными
    * `DOCKER_HUB_USERNAME` и `DOCKER_HUB_ACCESS_TOKEN` - юзернейм и токен от Docker Hub
    * `DEPLOY_DIR` - директория для деплоя на сервере
+   * `DOC_COMP_DEPLOY` - docker-compose.deploy.yml из корня проекта (так проще)
 4. Также важно добавить пользователя `SSH_USER` в группу `docker` на сервере
    * `getent group docker` - проверить, есть ли группа `docker` (если нет никакого output, то создать - `sudo groupadd docker`)
    * `sudo usermod -aG docker <username>` - добавление <username> в группу

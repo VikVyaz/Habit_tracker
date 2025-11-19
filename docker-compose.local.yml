@@ -25,9 +25,7 @@ services:
 
   nginx:
     container_name: nginx
-    build:
-      context: .
-      dockerfile: Dockerfiles/nginx/Dockerfile
+    image: nginx:1.29.3
     ports:
       - '80:80'
     volumes:
