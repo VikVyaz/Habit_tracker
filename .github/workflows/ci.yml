@@ -108,10 +108,11 @@ jobs:
           
             sed -i '/^TAG=/d' .env
             echo "TAG=${GITHUB_SHA}" >> .env
-          
-            export DOCKER_HUB_USERNAME=${{ secrets.DOCKER_HUB_USERNAME }}
             
-            docker pull $DOCKER_HUB_USERNAME/drf_final_web:${GITHUB_SHA}
+            sed -i '/^DOCKER_HUB_USERNAME=/d' .env
+            echo "DOCKER_HUB_USERNAME=${{ secrets.DOCKER_HUB_USERNAME }}" >> .env
+            
+            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/drf_final_web:${GITHUB_SHA}
             
             docker stop web 2>/dev/null || true
             docker rm web 2>/dev/null || true

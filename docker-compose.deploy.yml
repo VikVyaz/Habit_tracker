@@ -1,7 +1,7 @@
 services:
   web:
     container_name: web
-    image: ${DOCKER_HUB_USERNAME}/myapp:${TAG}
+    image: ${DOCKER_HUB_USERNAME}/drf_final_web:${TAG}
     command: >
       sh -c "python manage.py migrate &&
              python manage.py collectstatic --noinput &&
@@ -27,7 +27,7 @@ services:
 
   celery:
     container_name: celery
-    image: ${DOCKER_HUB_USERNAME}/myapp:${TAG}
+    image: ${DOCKER_HUB_USERNAME}/drf_final_web:${TAG}
     command: celery -A config worker -l INFO -P eventlet
     depends_on:
       redis:
@@ -37,7 +37,7 @@ services:
 
   beat:
     container_name: celery-beat
-    image: ${DOCKER_HUB_USERNAME}/myapp:${TAG}
+    image: ${DOCKER_HUB_USERNAME}/drf_final_web:${TAG}
     command: celery -A config beat -l INFO
     depends_on:
       redis:
