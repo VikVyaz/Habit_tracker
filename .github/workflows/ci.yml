@@ -112,7 +112,7 @@ jobs:
             sed -i '/^DOCKER_HUB_USERNAME=/d' .env
             echo "DOCKER_HUB_USERNAME=${{ secrets.DOCKER_HUB_USERNAME }}" >> .env
             
-            docker compose down
+            docker compose down --remove-orphans
             
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/drf_final_web:${GITHUB_SHA}
             
