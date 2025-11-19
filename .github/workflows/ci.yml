@@ -112,15 +112,10 @@ jobs:
             sed -i '/^DOCKER_HUB_USERNAME=/d' .env
             echo "DOCKER_HUB_USERNAME=${{ secrets.DOCKER_HUB_USERNAME }}" >> .env
             
+            docker compose down
+            
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/drf_final_web:${GITHUB_SHA}
             
-            docker stop web 2>/dev/null || true
-            docker rm web 2>/dev/null || true
-            
-            if ! docker ps -a --format '{{.Names}}' | grep -q '^db$'; then
-              docker compose up -d
-            else
-              docker compose up -d --no-deps --no-recreate web
-            fi
+            docker compose up -d
           
           EOF
