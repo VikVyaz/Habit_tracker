@@ -31,7 +31,7 @@ API-backend для сервиса трекинга привычек с Telegram-
 * Docker, Docker Compose, Docker Hub
 * GitHub Actions (CI/CD), GitHub Secrets
 * Swagger / Redoc
-* pytest
+* unittest
 
 ## Локальный деплой
 Шаги:
